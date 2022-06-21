@@ -1,9 +1,32 @@
 import 'package:conny/src/exceptions.dart';
 import 'dart:io';
 
+// Base class to control console behaviour
 class Conny {
   static const String _ESCAPE = '\x1b[';
   static const String _RESET = '0m';
+
+  /* writes to stdout with options provided then resets to default.
+  WriteOptions have default values and are intended to be set by user */
+  static void write(WriteOptions options, String str) {
+    if (stdout.hasTerminal) {
+      var o = options.options();
+
+      setGraphic(
+        bold: o['bold'],
+        dim: o['dim'],
+        italic: o['italic'],
+        underline: o['underline'],
+        strike: o['strike']);
+
+      setColourRGB(o['fg'], o['bg']);
+
+      stdout.writeln(str);
+      reset();
+    } else {
+      throw NoTerminalException();
+    }
+  }
 
   // reset all set graphic and colour modes to base terminal
   static void reset() {
@@ -72,6 +95,7 @@ class Conny {
 
   // set foreground and background colours using Colour Enum
   static void setColour(Colour fg, {Colour bg = Colour.DEFAULT}) {
+    // mapping enum to correct foreground colours
     var fgMap = {
       Colour.BLACK: _Colour.BLACK,
       Colour.RED: _Colour.RED,
@@ -84,6 +108,7 @@ class Conny {
       Colour.DEFAULT: _Colour.DEFAULT
     };
 
+    // mapping enum to correct background colours
     var bgMap = {
       Colour.BLACK: _Colour.BLACK_BG,
       Colour.RED: _Colour.RED_BG,
@@ -103,6 +128,10 @@ class Conny {
     }
   }
 
+  /* set colours using an id in range of 0 - 255
+  0 - 15 are the Enum Colours + bright variants
+  16 - 231 are different colour variants,
+  232 - 255 are grayscale starting with a lighter black */
   static void setColour256(int idfg, int idbg) {
     if (stdout.hasTerminal) {
       if ((idfg > 0 && idfg < 256) && (idbg > 0 && idbg < 256)) {
@@ -117,19 +146,30 @@ class Conny {
     }
   }
 
+  /* set colours using RGB values
+  params should mimic this map:
+  Map<String, int> varName = {
+    'r' : intValue in range of 0 - 255,
+    'g' : intValue in range of 0 - 255,
+    'b' : intValue in range of 0 - 255
+  }
+  The key names must be r, g, b */
   static void setColourRGB(Map<String, int> fg, Map<String, int> bg) {
     if (stdout.hasTerminal) {
       if (fg.length == 3) {
         fg.forEach((key, value) {
-          if (value < 0 || value > 256) {
+          if (value < 0 || value > 255) {
             reset();
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
         });
-        stdout.write("$_ESCAPE${_Colour.RGB};${fg['r']};${fg['g']};${fg['b']}m");
+        stdout.write("$_ESCAPE${_Colour.RGB}${fg['r']};${fg['g']};${fg['b']}m");
       } else {
         reset();
-        throw OutOfRangeException("Foreground RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}", 3, 3);
+        throw OutOfRangeException(
+            "Foreground RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}",
+            3,
+            3);
       }
 
       if (bg.length == 3) {
@@ -139,17 +179,21 @@ class Conny {
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
         });
-        stdout.write("$_ESCAPE${_Colour.RGB_BG};${bg['r']};${bg['g']};${bg['b']}m");
+        stdout.write(
+            "$_ESCAPE${_Colour.RGB_BG}${bg['r']};${bg['g']};${bg['b']}m");
       } else {
         reset();
-        throw OutOfRangeException("Background RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}", 3, 3);
+        throw OutOfRangeException(
+            "Background RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}",
+            3,
+            3);
       }
     } else {
       throw NoTerminalException();
     }
   }
 
-  // erase
+  // erase line or screen, this does not reposition cursor
   static void erase({bool screen = false}) {
     if (stdout.hasTerminal) {
       if (!screen) {
@@ -163,6 +207,65 @@ class Conny {
   }
 }
 
+// Holds options for Conny.write
+class WriteOptions {
+  // graphics
+  late bool _bold;
+  late bool _dim;
+  late bool _italic;
+  late bool _underline;
+  late bool _strike;
+
+  // colours
+  late int _rf;
+  late int _gf;
+  late int _bf;
+
+  late int _rb;
+  late int _gb;
+  late int _bb;
+
+  WriteOptions(
+      {bool bold = false,
+      bool dim = false,
+      bool italic = false,
+      bool underline = false,
+      bool strike = false,
+      int rf = 0,
+      int gf = 0,
+      int bf = 0,
+      int rb = 0,
+      int gb = 0,
+      int bb = 0}) {
+    _bold = bold;
+    _dim = dim;
+    _italic = italic;
+    _underline = underline;
+    _strike = strike;
+
+    _rf = rf;
+    _gf = gf;
+    _bf = bf;
+
+    _rb = rb;
+    _gb = gb;
+    _bb = bb;
+  }
+
+  Map<String, dynamic> options() {
+    return {
+      'bold': _bold,
+      'dim': _dim,
+      'italic': _italic,
+      'underline': _underline,
+      'strike': _strike,
+      'fg': {'r': _rf, 'g': _gf, 'b': _bf},
+      'bg': {'r': _rb, 'g': _gb, 'b': _bb}
+    };
+  }
+}
+
+// Erase chars
 class _Erase {
   static const String SCREEN = '2J';
   static const String LINE = '2K';
@@ -171,6 +274,7 @@ class _Erase {
 // These colours are set by the terminal/user
 enum Colour { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, DEFAULT }
 
+// Colour chars, m stripped
 class _Colour {
   static const String ID = '38;5;';
   static const String ID_BG = '48;5;';
@@ -206,6 +310,7 @@ class _Colour {
   static const String DEFAULT_BG = '49';
 }
 
+// Grpahic chars
 class _Graphic {
   static const String SET_BOLD = '1m';
   static const String UNSET_BOLD = '22m';
