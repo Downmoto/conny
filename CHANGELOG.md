@@ -1,3 +1,8 @@
+## 1.0.3
+
+- Expanded Colouring options with Background only functionality
+- Expanded WriteOptions and write function for more custom usage in regards to above additions
+
 ## 1.0.2
 
 - Added write and WriteOptions

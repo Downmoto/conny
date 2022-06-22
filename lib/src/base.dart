@@ -8,7 +8,7 @@ class Conny {
 
   /* writes to stdout with options provided then resets to default.
   WriteOptions have default values and are intended to be set by user */
-  static void write(WriteOptions options, String str) {
+  static void write(WriteOptions options, String str, {bool newline = true}) {
     if (stdout.hasTerminal) {
       var o = options.options();
 
@@ -21,9 +21,16 @@ class Conny {
 
       setColourRGB(o['fg'], o['bg']);
 
+      if (o['dbg']) {
+        setBackgroundColour(Colour.DEFAULT);
+      }
+
       stdout.write(str);
       reset();
-      stdout.writeln();
+
+      if (newline) {
+        stdout.writeln();
+      }
     } else {
       throw NoTerminalException();
     }
@@ -194,6 +201,62 @@ class Conny {
     }
   }
 
+  static void setBackgroundColour(Colour clr) {
+    // mapping enum to correct background colours
+    var clMap = {
+      Colour.BLACK: _Colour.BLACK_BG,
+      Colour.RED: _Colour.RED_BG,
+      Colour.GREEN: _Colour.GREEN_BG,
+      Colour.YELLOW: _Colour.YELLOW_BG,
+      Colour.BLUE: _Colour.BLUE_BG,
+      Colour.MAGENTA: _Colour.MAGENTA_BG,
+      Colour.CYAN: _Colour.CYAN_BG,
+      Colour.WHITE: _Colour.WHITE_BG,
+      Colour.DEFAULT: _Colour.DEFAULT_BG
+    };
+
+    if (stdout.hasTerminal) {
+      stdout.write("$_ESCAPE${clMap[clr]}m");
+    } else {
+      throw NoTerminalException();
+    }
+  }
+
+  static void setBackgroundColour256(int idclr) {
+    if (stdout.hasTerminal) {
+      if (idclr > 0 && idclr < 256) {
+        stdout.write("$_ESCAPE${_Colour.ID_BG}${idclr}m");
+      } else {
+        reset();
+        throw OutOfRangeException("Out of ID range", 0, 255);
+      }
+    } else {
+      throw NoTerminalException();
+    }
+  }
+
+  static void setBackgroundColourRGB(Map<String, int> clr) {
+    if (stdout.hasTerminal) {
+      if (clr.length == 3) {
+        clr.forEach((key, value) {
+          if (value < 0 || value > 255) {
+            reset();
+            throw OutOfRangeException("Out of RGB range", 0, 255);
+          }
+        });
+        stdout.write("$_ESCAPE${_Colour.RGB}${clr['r']};${clr['g']};${clr['b']}m");
+      } else {
+        reset();
+        throw OutOfRangeException(
+            "Background RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}",
+            3,
+            3);
+      }
+    } else {
+      throw NoTerminalException();
+    }
+  }
+
   // erase line or screen, this does not reposition cursor
   static void erase({bool screen = false}) {
     if (stdout.hasTerminal) {
@@ -222,6 +285,8 @@ class WriteOptions {
   late int _gf;
   late int _bf;
 
+  late bool _dbg;
+
   late int _rb;
   late int _gb;
   late int _bb;
@@ -232,6 +297,7 @@ class WriteOptions {
       bool italic = false,
       bool underline = false,
       bool strike = false,
+      bool defaultBackground = true,
       int rf = 0,
       int gf = 0,
       int bf = 0,
@@ -248,6 +314,8 @@ class WriteOptions {
     _gf = gf;
     _bf = bf;
 
+    _dbg = defaultBackground;
+
     _rb = rb;
     _gb = gb;
     _bb = bb;
@@ -260,6 +328,7 @@ class WriteOptions {
       'italic': _italic,
       'underline': _underline,
       'strike': _strike,
+      'dbg': _dbg,
       'fg': {'r': _rf, 'g': _gf, 'b': _bf},
       'bg': {'r': _rb, 'g': _gb, 'b': _bb}
     };

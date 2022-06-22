@@ -4,6 +4,7 @@ import 'dart:math';
 
 WriteOptions opt = WriteOptions(
   bold: true,
+  defaultBackground: false,
   rf: 180,
   gf: 70,
   bf: 110,
@@ -87,6 +88,7 @@ void colourExample() {
       WriteOptions(
         bold: (i % 2 == 0),
         strike: (i % 2 != 0),
+        defaultBackground: false,
         rf: rnd.nextInt(256),
         gf: rnd.nextInt(256),
         bf: rnd.nextInt(256),
