@@ -21,8 +21,9 @@ class Conny {
 
       setColourRGB(o['fg'], o['bg']);
 
-      stdout.writeln(str);
+      stdout.write(str);
       reset();
+      stdout.writeln();
     } else {
       throw NoTerminalException();
     }
@@ -310,7 +311,7 @@ class _Colour {
   static const String DEFAULT_BG = '49';
 }
 
-// Grpahic chars
+// Graphic chars
 class _Graphic {
   static const String SET_BOLD = '1m';
   static const String UNSET_BOLD = '22m';
