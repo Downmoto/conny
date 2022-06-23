@@ -1,13 +1,21 @@
-import 'package:conny/src/exceptions.dart';
+import 'package:conny/src/helper/exceptions.dart';
 import 'dart:io';
 
-// Base class to control console behaviour
+/// base class to control console behaviour
+/// 
+/// all methods are static, return nothing and the class
+/// does not/should not be instantiated
 class Conny {
   static const String _ESCAPE = '\x1b[';
   static const String _RESET = '0m';
 
-  /* writes to stdout with options provided then resets to default.
-  WriteOptions have default values and are intended to be set by user */
+  /// writes to [stdout] with options provided then resets to default.
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
+  /// 
+  /// * [WriteOptions] have default values and are intended to be set by user
+  /// * [str] is a [String] object which will be written to [stdout]
+  /// * [newline] is an optional argument defaulted to true
   static void write(WriteOptions options, String str, {bool newline = true}) {
     if (stdout.hasTerminal) {
       var o = options.options();
@@ -36,7 +44,9 @@ class Conny {
     }
   }
 
-  // reset all set graphic and colour modes to base terminal
+  /// reset all set graphic and colour modes to terminal default
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
   static void reset() {
     if (stdout.hasTerminal) {
       stdout.write("$_ESCAPE$_RESET");
@@ -45,7 +55,9 @@ class Conny {
     }
   }
 
-  // set graphic modes, use unset() or reset() to revert graphic
+  /// set graphic modes, use [unsetGraphic] or [reset] to revert graphics
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
   static void setGraphic(
       {bool bold = false,
       bool dim = false,
@@ -73,7 +85,9 @@ class Conny {
     }
   }
 
-  // unset speific graphic modes, use reset() to unset all
+  /// unset speific graphic modes, use [reset] to unset all
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
   static void unsetGraphic(
       {bool bold = false,
       bool dim = false,
@@ -101,7 +115,9 @@ class Conny {
     }
   }
 
-  // set foreground and background colours using Colour Enum
+  /// set foreground[fg] and background[bg] colours using [Colour] Enum
+  ///
+  /// throws [NoTerminalException] if no terminal is attached
   static void setColour(Colour fg, {Colour bg = Colour.DEFAULT}) {
     // mapping enum to correct foreground colours
     var fgMap = {
@@ -136,10 +152,17 @@ class Conny {
     }
   }
 
-  /* set colours using an id in range of 0 - 255
-  0 - 15 are the Enum Colours + bright variants
-  16 - 231 are different colour variants,
-  232 - 255 are grayscale starting with a lighter black */
+  /// set colours using an id in range of 0 - 255
+  /// 0 - 15 are the Enum Colours + bright variants
+  /// 16 - 231 are different colour variants,
+  /// 232 - 255 are grayscale starting with a lighter black
+  /// 
+  /// throws [OutOfRangeException] if [idfg] or [idbg] are > 0 || < 256
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
+  /// 
+  /// * [idfg] foreground ID
+  /// * [idbg] background ID
   static void setColour256(int idfg, int idbg) {
     if (stdout.hasTerminal) {
       if ((idfg > 0 && idfg < 256) && (idbg > 0 && idbg < 256)) {
@@ -154,14 +177,19 @@ class Conny {
     }
   }
 
-  /* set colours using RGB values
-  params should mimic this map:
-  Map<String, int> varName = {
-    'r' : intValue in range of 0 - 255,
-    'g' : intValue in range of 0 - 255,
-    'b' : intValue in range of 0 - 255
-  }
-  The key names must be r, g, b */
+  /// set colours using RGB values
+  /// params should mimic this map:
+  /// Map<String, int> varName = {
+  ///   'r' : intValue in range of 0 - 255,
+  ///   'g' : intValue in range of 0 - 255,
+  ///   'b' : intValue in range of 0 - 255
+  /// }
+  /// the key names must be r, g, b
+  /// 
+  /// throws [OutOfRangeException] if [fg] or [bg] do not contain 3 K:V pairs
+  /// or if any of the values are > 0 || < 256
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
   static void setColourRGB(Map<String, int> fg, Map<String, int> bg) {
     if (stdout.hasTerminal) {
       if (fg.length == 3) {
@@ -257,7 +285,12 @@ class Conny {
     }
   }
 
-  // erase line or screen, this does not reposition cursor
+  /// erase line or screen, this does not reposition cursor
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
+  /// 
+  /// * [screen] is defauled to false, 
+  /// thus by default [erase] erases the line the cursor is on
   static void erase({bool screen = false}) {
     if (stdout.hasTerminal) {
       if (!screen) {
@@ -271,7 +304,7 @@ class Conny {
   }
 }
 
-// Holds options for Conny.write
+/// holds options for [Conny.write]
 class WriteOptions {
   // graphics
   late bool _bold;
@@ -321,6 +354,8 @@ class WriteOptions {
     _bb = bb;
   }
 
+  /// returns [Map] object of type [String] and [dynamic] with 
+  /// set user write options
   Map<String, dynamic> options() {
     return {
       'bold': _bold,
@@ -335,16 +370,16 @@ class WriteOptions {
   }
 }
 
-// Erase chars
+/// erase ANSI codes
 class _Erase {
   static const String SCREEN = '2J';
   static const String LINE = '2K';
 }
 
-// These colours are set by the terminal/user
+/// these colours are set by the terminal/user
 enum Colour { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, DEFAULT }
 
-// Colour chars, m stripped
+/// colour ANSI codes, m stripped
 class _Colour {
   static const String ID = '38;5;';
   static const String ID_BG = '48;5;';
@@ -380,7 +415,7 @@ class _Colour {
   static const String DEFAULT_BG = '49';
 }
 
-// Graphic chars
+/// craphic ANSI codes
 class _Graphic {
   static const String SET_BOLD = '1m';
   static const String UNSET_BOLD = '22m';

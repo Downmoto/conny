@@ -1,3 +1,8 @@
+## 1.1.0
+
+- Added Cursor support
+- Increased and improved in-document Documentation
+
 ## 1.0.3
 
 - Expanded Colouring options with Background only functionality
