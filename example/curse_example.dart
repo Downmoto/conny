@@ -24,7 +24,5 @@ void main(List<String> args) {
   c.moveCursorDown(by: 3);
   c.moveCursorLeft(by: 10);
 
-  Conny.write(WriteOptions(bold: true, rf: 40, gf: 190, bf: 10), "{8}");
-
-  print(5 ~/ 2);
+  Conny.write(WriteOptions(bold: true, fg: [40, 190, 10]), "{8}");
 }

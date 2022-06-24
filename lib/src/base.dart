@@ -2,7 +2,7 @@ import 'package:conny/src/helper/exceptions.dart';
 import 'dart:io';
 
 /// base class to control console behaviour
-/// 
+///
 /// all methods are static, return nothing and the class
 /// does not/should not be instantiated
 class Conny {
@@ -10,9 +10,9 @@ class Conny {
   static const String _RESET = '0m';
 
   /// writes to [stdout] with options provided then resets to default.
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
-  /// 
+  ///
   /// * [WriteOptions] have default values and are intended to be set by user
   /// * [str] is a [String] object which will be written to [stdout]
   /// * [newline] is an optional argument defaulted to true
@@ -21,11 +21,11 @@ class Conny {
       var o = options.options();
 
       setGraphic(
-        bold: o['bold'],
-        dim: o['dim'],
-        italic: o['italic'],
-        underline: o['underline'],
-        strike: o['strike']);
+          bold: o['bold'],
+          dim: o['dim'],
+          italic: o['italic'],
+          underline: o['underline'],
+          strike: o['strike']);
 
       setColourRGB(o['fg'], o['bg']);
 
@@ -45,7 +45,7 @@ class Conny {
   }
 
   /// reset all set graphic and colour modes to terminal default
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
   static void reset() {
     if (stdout.hasTerminal) {
@@ -56,7 +56,7 @@ class Conny {
   }
 
   /// set graphic modes, use [unsetGraphic] or [reset] to revert graphics
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
   static void setGraphic(
       {bool bold = false,
@@ -86,7 +86,7 @@ class Conny {
   }
 
   /// unset speific graphic modes, use [reset] to unset all
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
   static void unsetGraphic(
       {bool bold = false,
@@ -156,11 +156,11 @@ class Conny {
   /// 0 - 15 are the Enum Colours + bright variants
   /// 16 - 231 are different colour variants,
   /// 232 - 255 are grayscale starting with a lighter black
-  /// 
+  ///
   /// throws [OutOfRangeException] if [idfg] or [idbg] are > 0 || < 256
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
-  /// 
+  ///
   /// * [idfg] foreground ID
   /// * [idbg] background ID
   static void setColour256(int idfg, int idbg) {
@@ -179,50 +179,40 @@ class Conny {
 
   /// set colours using RGB values
   /// params should mimic this map:
-  /// Map<String, int> varName = {
-  ///   'r' : intValue in range of 0 - 255,
-  ///   'g' : intValue in range of 0 - 255,
-  ///   'b' : intValue in range of 0 - 255
-  /// }
-  /// the key names must be r, g, b
-  /// 
-  /// throws [OutOfRangeException] if [fg] or [bg] do not contain 3 K:V pairs
+  /// List<int> varName = [0, 0, 0]
+  ///
+  /// throws [OutOfRangeException] if [fg] or [bg] do not contain 3 integer values
   /// or if any of the values are > 0 || < 256
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
-  static void setColourRGB(Map<String, int> fg, Map<String, int> bg) {
+  static void setColourRGB(List<int> fg, List<int> bg) {
     if (stdout.hasTerminal) {
       if (fg.length == 3) {
-        fg.forEach((key, value) {
+        for (int value in fg) {
           if (value < 0 || value > 255) {
             reset();
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
-        });
-        stdout.write("$_ESCAPE${_Colour.RGB}${fg['r']};${fg['g']};${fg['b']}m");
+        }
+        stdout.write("$_ESCAPE${_Colour.RGB}${fg[0]};${fg[1]};${fg[2]}m");
       } else {
         reset();
         throw OutOfRangeException(
-            "Foreground RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}",
-            3,
-            3);
+            "Foreground RGB list out of range. EG var rgb = [0, 0, 0]", 3, 3);
       }
 
       if (bg.length == 3) {
-        bg.forEach((key, value) {
+        for (int value in bg) {
           if (value < 0 || value > 256) {
             reset();
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
-        });
-        stdout.write(
-            "$_ESCAPE${_Colour.RGB_BG}${bg['r']};${bg['g']};${bg['b']}m");
+        }
+        stdout.write("$_ESCAPE${_Colour.RGB_BG}${bg[0]};${bg[1]};${bg[2]}m");
       } else {
         reset();
         throw OutOfRangeException(
-            "Background RGB map out of range. EG var rgb = {'r':0,'g':0,'b':0}",
-            3,
-            3);
+            "Background RGB list out of range. EG var rgb = [0, 0, 0]", 3, 3);
       }
     } else {
       throw NoTerminalException();
@@ -272,7 +262,8 @@ class Conny {
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
         });
-        stdout.write("$_ESCAPE${_Colour.RGB}${clr['r']};${clr['g']};${clr['b']}m");
+        stdout.write(
+            "$_ESCAPE${_Colour.RGB}${clr['r']};${clr['g']};${clr['b']}m");
       } else {
         reset();
         throw OutOfRangeException(
@@ -286,10 +277,10 @@ class Conny {
   }
 
   /// erase line or screen, this does not reposition cursor
-  /// 
+  ///
   /// throws [NoTerminalException] if no terminal is attached
-  /// 
-  /// * [screen] is defauled to false, 
+  ///
+  /// * [screen] is defauled to false,
   /// thus by default [erase] erases the line the cursor is on
   static void erase({bool screen = false}) {
     if (stdout.hasTerminal) {
@@ -314,15 +305,11 @@ class WriteOptions {
   late bool _strike;
 
   // colours
-  late int _rf;
-  late int _gf;
-  late int _bf;
-
+  late List<int> _fg;
   late bool _dbg;
+  late List<int> _bg;
 
-  late int _rb;
-  late int _gb;
-  late int _bb;
+  static const List<int> _default = [0, 0, 0];
 
   WriteOptions(
       {bool bold = false,
@@ -331,30 +318,20 @@ class WriteOptions {
       bool underline = false,
       bool strike = false,
       bool defaultBackground = true,
-      int rf = 0,
-      int gf = 0,
-      int bf = 0,
-      int rb = 0,
-      int gb = 0,
-      int bb = 0}) {
+      List<int> fg = _default,
+      List<int> bg = _default}) {
     _bold = bold;
     _dim = dim;
     _italic = italic;
     _underline = underline;
     _strike = strike;
 
-    _rf = rf;
-    _gf = gf;
-    _bf = bf;
-
+    _fg = fg;
     _dbg = defaultBackground;
-
-    _rb = rb;
-    _gb = gb;
-    _bb = bb;
+    _bg = bg;
   }
 
-  /// returns [Map] object of type [String] and [dynamic] with 
+  /// returns [Map] object of type [String] and [dynamic] with
   /// set user write options
   Map<String, dynamic> options() {
     return {
@@ -364,8 +341,8 @@ class WriteOptions {
       'underline': _underline,
       'strike': _strike,
       'dbg': _dbg,
-      'fg': {'r': _rf, 'g': _gf, 'b': _bf},
-      'bg': {'r': _rb, 'g': _gb, 'b': _bb}
+      'fg': _fg,
+      'bg': _bg
     };
   }
 }

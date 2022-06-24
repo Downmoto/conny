@@ -5,12 +5,8 @@ import 'dart:math';
 WriteOptions opt = WriteOptions(
   bold: true,
   defaultBackground: false,
-  rf: 180,
-  gf: 70,
-  bf: 110,
-  rb: 242,
-  gb: 193,
-  bb: 80
+  fg: [180, 70, 110],
+  bg: [242, 193, 0]
 );
 
 void separator() {
@@ -77,9 +73,7 @@ void colourExample() {
       WriteOptions(
         bold: (i % 2 == 0),
         strike: (i % 2 == 0),
-        rf: rnd.nextInt(256), 
-        gf: rnd.nextInt(256), 
-        bf: rnd.nextInt(256)),
+        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]),
       "Colours");
   }
 
@@ -89,12 +83,8 @@ void colourExample() {
         bold: (i % 2 == 0),
         strike: (i % 2 != 0),
         defaultBackground: false,
-        rf: rnd.nextInt(256),
-        gf: rnd.nextInt(256),
-        bf: rnd.nextInt(256),
-        rb: rnd.nextInt(256),
-        gb: rnd.nextInt(256),
-        bb: rnd.nextInt(256)),
+        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)],
+        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]),
       "Colours");
   }
 }
