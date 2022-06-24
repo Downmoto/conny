@@ -173,6 +173,8 @@ class Curse {
 }
 
 /// Stores coordinates and is used by the [Curse] class
+/// 
+/// contains two public fields [col] and [row]  of type [int]
 class Coord {
   late int col, row;
   Coord(this.col, this.row);

@@ -178,7 +178,7 @@ class Conny {
   }
 
   /// set colours using RGB values
-  /// params should mimic this map:
+  /// params should mimic this variable:
   /// List<int> varName = [0, 0, 0]
   ///
   /// throws [OutOfRangeException] if [fg] or [bg] do not contain 3 integer values
@@ -219,6 +219,9 @@ class Conny {
     }
   }
 
+  /// set background [clr] colour using [Colour] Enum
+  /// 
+  /// throws [NoTerminalException] if no terminal is attached
   static void setBackgroundColour(Colour clr) {
     // mapping enum to correct background colours
     var clMap = {
@@ -240,6 +243,16 @@ class Conny {
     }
   }
 
+  /// set colour using an [int] id in range of 0 - 255
+  /// 0 - 15 are the Enum Colours + bright variants
+  /// 16 - 231 are different colour variants,
+  /// 232 - 255 are grayscale starting with a lighter black
+  ///
+  /// throws [OutOfRangeException] if [idclr] is > 0 || < 256
+  ///
+  /// throws [NoTerminalException] if no terminal is attached
+  ///
+  /// * [idclr] background ID
   static void setBackgroundColour256(int idclr) {
     if (stdout.hasTerminal) {
       if (idclr > 0 && idclr < 256) {
@@ -253,17 +266,25 @@ class Conny {
     }
   }
 
-  static void setBackgroundColourRGB(Map<String, int> clr) {
+  /// set colour using RGB values
+  /// params should mimic this variable:
+  /// List<int> varName = [0, 0, 0]
+  ///
+  /// throws [OutOfRangeException] if [clr] does not contain 3 integer values
+  /// or if any of the values are > 0 || < 256
+  ///
+  /// throws [NoTerminalException] if no terminal is attached
+  static void setBackgroundColourRGB(List<int> clr) {
     if (stdout.hasTerminal) {
       if (clr.length == 3) {
-        clr.forEach((key, value) {
+        for (int value in clr) {
           if (value < 0 || value > 255) {
             reset();
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
-        });
+        };
         stdout.write(
-            "$_ESCAPE${_Colour.RGB}${clr['r']};${clr['g']};${clr['b']}m");
+            "$_ESCAPE${_Colour.RGB}${clr[0]};${clr[1]};${clr[2]}m");
       } else {
         reset();
         throw OutOfRangeException(
@@ -392,7 +413,7 @@ class _Colour {
   static const String DEFAULT_BG = '49';
 }
 
-/// craphic ANSI codes
+/// graphic ANSI codes
 class _Graphic {
   static const String SET_BOLD = '1m';
   static const String UNSET_BOLD = '22m';
