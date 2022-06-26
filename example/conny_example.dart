@@ -17,7 +17,14 @@ void separator() {
 }
 
 void init() {
+  Conny.erase(screen: true);
+  
+  Curse c = Curse();
+  c.home();
+
+  Conny.setColour(Colour.MAGENTA);
   stdout.write("█▀▀ █▀█ █▄░█ █▄░█ █▄█\n█▄▄ █▄█ █░▀█ █░▀█ ░█░\n");
+  Conny.setColour(Colour.DEFAULT);
 }
 
 void graphicExample() {
@@ -48,7 +55,7 @@ void graphicExample() {
 }
 
 void mixedGraphicExample() {
-  Conny.write(opt, "mixed graphics");
+  Conny.write(opt, "mixed graphic examples");
   stdout.writeln();
 
   stdout.writeln("Base");
@@ -63,7 +70,7 @@ void mixedGraphicExample() {
 }
 
 void colourExample() {
-  Conny.write(opt, "Colours");
+  Conny.write(opt, "Colour examples");
   stdout.writeln();
 
   Random rnd = Random();
@@ -72,20 +79,36 @@ void colourExample() {
     Conny.write(
       WriteOptions(
         bold: (i % 2 == 0),
-        strike: (i % 2 == 0),
-        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]),
-      "Colours");
+        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
+        ), "Colours", newline: false);
+      
+    stdout.write(' ');
+
+    Conny.write(
+      WriteOptions(
+        bold: !(i % 2 ==0),
+        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
+      ), "Colours");
   }
 
   for (var i = 0; i < 4; i++) {
     Conny.write(
       WriteOptions(
         bold: (i % 2 == 0),
-        strike: (i % 2 != 0),
         defaultBackground: false,
         fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)],
-        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]),
-      "Colours");
+        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
+        ), "Colours", newline: false);
+
+    stdout.write(' ');
+
+    Conny.write(
+      WriteOptions(
+        bold: !(i % 2 == 0),
+        defaultBackground: false,
+        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)],
+        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
+        ), "Colours");
   }
 }
 
@@ -97,11 +120,11 @@ void main() {
   separator();
   mixedGraphicExample();
   separator();
-  Conny.write(opt, "End of Graphics Example");
+  Conny.write(opt, "End of Graphic examples");
   separator();
 
   colourExample();
   separator();
-  Conny.write(opt, "End of Colours Example");
+  Conny.write(opt, "End of Colour examples");
   separator();
 }

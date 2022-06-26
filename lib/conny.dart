@@ -1,4 +1,4 @@
 library conny;
 
-export 'src/base.dart';
+export 'src/conny.dart';
 export 'src/curse.dart';

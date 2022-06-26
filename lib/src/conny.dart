@@ -282,7 +282,7 @@ class Conny {
             reset();
             throw OutOfRangeException("Out of RGB range", 0, 255);
           }
-        };
+        }
         stdout.write(
             "$_ESCAPE${_Colour.RGB}${clr[0]};${clr[1]};${clr[2]}m");
       } else {
