@@ -43,7 +43,7 @@ class Bar {
   Iterable<String> start() => _loop();
 
   /// fills bar upto [fillLine] with [dark] and 
-  /// to [length] - [fillLine] withh [light]
+  /// to [length] - [fillLine] with [light]
   void _fill() {
     int fillLine = (_state*_length) ~/ 100;
 
