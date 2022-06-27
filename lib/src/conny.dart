@@ -306,7 +306,7 @@ class Conny {
   static void erase({bool screen = false}) {
     if (stdout.hasTerminal) {
       if (!screen) {
-        stdout.writeln("$_ESCAPE${_Erase.LINE}");
+        stdout.write("$_ESCAPE${_Erase.LINE}");
       } else {
         stdout.write("$_ESCAPE${_Erase.SCREEN}");
       }
