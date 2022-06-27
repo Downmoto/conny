@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Added Loading Bar support
+
 ## 1.1.0
 
 - Added Cursor support
