@@ -8,4 +8,5 @@
 
 ## bars
 [Documentation](https://github.com/Downmoto/conny/tree/main/docs/bars)
+
 ![bars example](../assets/gifs/bars_example.gif)
