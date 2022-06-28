@@ -2,18 +2,10 @@ import 'package:conny/conny.dart';
 import 'dart:io';
 import 'dart:math';
 
-WriteOptions opt = WriteOptions(
-  bold: true,
-  defaultBackground: false,
-  fg: [180, 70, 110],
-  bg: [242, 193, 0]
-);
-
-void separator() {
-  for (var i = 0; i < stdout.terminalColumns ~/ 3; i++) {
-    stdout.write('-');
-  }
-  stdout.writeln();
+void main(List<String> args) {
+  init();
+  graphic();
+  colour();
 }
 
 void init() {
@@ -22,109 +14,100 @@ void init() {
   Curse c = Curse();
   c.home();
 
-  Conny.setColour(Colour.MAGENTA);
-  stdout.write("█▀▀ █▀█ █▄░█ █▄░█ █▄█\n█▄▄ █▄█ █░▀█ █░▀█ ░█░\n");
-  Conny.setColour(Colour.DEFAULT);
+  Conny.write(title, "█▀▀ █▀█ █▄░█ █▄░█ █▄█\n█▄▄ █▄█ █░▀█ █░▀█ ░█░");
+  separator();
 }
 
-void graphicExample() {
-  Conny.write(opt, "Graphic examples");
-  stdout.writeln();
+void graphic() {
+  Conny.write(subtitles, "Graphics\n");
 
-  stdout.writeln("Base");
+  String bold = Conny.style(WriteOptions(bold: true), "Bold");
+  String dim = Conny.style(WriteOptions(dim: true), "Dim");
+  String italic = Conny.style(WriteOptions(italic: true), "Italic");
+  String underline = Conny.style(WriteOptions(underline: true), "Underline");
+  String strike = Conny.style(WriteOptions(strike: true), "Strikethrough");
 
-  Conny.setGraphic(bold: true);
-  stdout.writeln("Bold");
-  Conny.unsetGraphic(bold: true);
+  String mixed = Conny.style(WriteOptions(
+    bold: true,
+    italic: true,
+    strike: true
+  ), "Mixed graphics");
 
-  Conny.setGraphic(dim: true);
-  stdout.writeln("Dim");
-  Conny.unsetGraphic(dim: true);
+  stdout.writeln("$bold $dim $italic");
+  stdout.writeln("$underline $strike");
+  stdout.writeln(mixed);
 
-  Conny.setGraphic(italic: true);
-  stdout.writeln("Italic");
-  Conny.unsetGraphic(italic: true);
-
-  Conny.setGraphic(underline: true);
-  stdout.writeln("Underline");
-  Conny.unsetGraphic(underline: true);
-
-  Conny.setGraphic(strike: true);
-  stdout.writeln("Strike");
-  Conny.unsetGraphic(strike: true);
-}
-
-void mixedGraphicExample() {
-  Conny.write(opt, "mixed graphic examples");
-  stdout.writeln();
-
-  stdout.writeln("Base");
-
-  Conny.setGraphic(bold: true, italic: true);
-  stdout.writeln("Bold, Italic");
-  Conny.unsetGraphic(bold: true, italic: true);
-
-  Conny.setGraphic(dim: true, underline: true);
-  stdout.writeln("Dim, Underline");
-  Conny.unsetGraphic(dim: true, underline: true);
-}
-
-void colourExample() {
-  Conny.write(opt, "Colour examples");
-  stdout.writeln();
+  Conny.write(subtitles, "\nColour Graphics\n");
 
   Random rnd = Random();
 
-  for (var i = 0; i < 4; i++) {
-    Conny.write(
-      WriteOptions(
-        bold: (i % 2 == 0),
-        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
-        ), "Colours", newline: false);
-      
-    stdout.write(' ');
+  for (var i = 0; i < 3; i++) {
+    int r = rnd.nextInt(255);
+    int g = rnd.nextInt(255);
+    int b = rnd.nextInt(255);
 
-    Conny.write(
-      WriteOptions(
-        bold: !(i % 2 ==0),
-        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
-      ), "Colours");
+    int rb = rnd.nextInt(255);
+    int gb = rnd.nextInt(255);
+    int bb = rnd.nextInt(255);
+
+    Conny.write(WriteOptions(
+      bold: true,
+      italic: true,
+      fg: [r, g, b],
+      bg: [rb, gb, bb]
+    ), "Colour graphics");
   }
 
-  for (var i = 0; i < 4; i++) {
-    Conny.write(
-      WriteOptions(
-        bold: (i % 2 == 0),
-        defaultBackground: false,
-        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)],
-        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
-        ), "Colours", newline: false);
+  separator();
+}
 
-    stdout.write(' ');
+void colour() {
+  Conny.write(subtitles, "Colours\n");
 
-    Conny.write(
-      WriteOptions(
-        bold: !(i % 2 == 0),
-        defaultBackground: false,
-        fg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)],
-        bg: [rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)]
-        ), "Colours");
+  Random rnd = Random();
+  for (var i = 0; i < 10; i++) {
+    int r = rnd.nextInt(255);
+    int g = rnd.nextInt(255);
+    int b = rnd.nextInt(255);
+
+    for (var j = 0; j < 10; j++) {
+      Conny.write(WriteOptions(
+        bg: [r, g, b]), 
+        " ", 
+        newline: false);
+    }
+
+    for (var j = 0; j < 10; j++) {
+      Conny.write(WriteOptions(
+        bg: [b, r, g]), 
+        " ", 
+        newline: false);
+    }
+
+    for (var j = 0; j < 10; j++) {
+      Conny.write(WriteOptions(
+        bg: [g, b, r]), 
+        " ", 
+        newline: false);
+    }
+    stdout.writeln();
   }
+  stdout.writeln();
 }
 
-void main() {
-  init();
-  separator();
-
-  graphicExample();
-  separator();
-  mixedGraphicExample();
-  separator();
-  Conny.write(opt, "End of Graphic examples");
-  separator();
-
-  colourExample();
-  separator();
-  Conny.write(opt, "End of Colour examples");
-  separator();
+void separator() {
+  for (var i = 0; i < 30; i++) {
+    stdout.write('-');
+  }
+  stdout.writeln();
 }
+
+WriteOptions title = WriteOptions(
+  fg: [120, 170, 220],
+  bg: [30, 60, 255]
+);
+
+WriteOptions subtitles = WriteOptions(
+  bold: true,
+  fg: [90, 200, 230]
+);

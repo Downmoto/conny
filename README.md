@@ -10,6 +10,7 @@ A simple dart console library
  - Colours
  - Graphics (bold, italic, etc)
  - Erase
+ - Bars
 
 ## Getting Started
 To get started with conny, look into the example dir in the above repository
@@ -17,7 +18,7 @@ To get started with conny, look into the example dir in the above repository
 
 ## Documentation
 
-[Documentation](https://github.com/Downmoto/conny/tree/main/docs)
+Read the [Documentation](https://github.com/Downmoto/conny/tree/main/docs)
 
 
 ## License

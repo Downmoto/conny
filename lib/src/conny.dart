@@ -203,7 +203,6 @@ class Conny {
   /// throws [NoTerminalException] if no terminal is attached
   ///
   /// * [idfg] foreground ID
-  /// * [idbg] background ID
   static void setColour256(int idfg) {
     if (stdout.hasTerminal) {
       if ((idfg > 0 && idfg < 256)) {
@@ -342,7 +341,7 @@ class Conny {
   }
 }
 
-/// holds options for [Conny.write]
+/// holds options for [Conny.write] and [Conny.style]
 class WriteOptions {
   // graphics
   late bool _bold;
