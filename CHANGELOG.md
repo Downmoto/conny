@@ -1,3 +1,8 @@
+## 1.2.1
+
+- Added inline styling for Strings with Conny.style
+- Started adding external detailed library documentation
+
 ## 1.2.0
 
 - Added Loading Bar support

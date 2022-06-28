@@ -46,6 +46,13 @@ class Conny {
     }
   }
 
+  /// inline styling to create strings with graphic and colour options, 
+  /// using [WriteOptions], without writing to [stdout]
+  /// 
+  /// throws [NoTerminalException] if no terminal is found
+  /// throws [OutOfRangeException] if RGB range requirments are not met (0 - 255)
+  /// 
+  /// returns styled [String], ready to write
   static String style(WriteOptions options, String str) {
     if (stdout.hasTerminal) {
       var o = options.options();
@@ -67,9 +74,25 @@ class Conny {
         s += ("$_ESCAPE${_Graphic.SET_STRIKETHROUGH}");
       }
 
+      var fg = o['fg'];
+      int fgSum = fg.fold(0, (p, c) => p + c);
+      if (fgSum >= 0 && fgSum <= 765) {
+        s += "$_ESCAPE${_Colour.RGB}${fg[0]};${fg[1]};${fg[2]}m";
+      } else if (fg[0] != -1) {
+        throw OutOfRangeException("Foreground Out of RGB range", 0, 225);
+      }
 
+      var bg = o['bg'];
+      int bgSum = fg.fold(0, (p, c) => p + c);
+      if (bgSum >= 0 && bgSum <= 765) {
+        s += "$_ESCAPE${_Colour.RGB_BG}${bg[0]};${bg[1]};${bg[2]}m";
+      } else if (bg[0] != -1) {
+        throw OutOfRangeException(" Background Out of RGB range", 0, 225);
+      }
 
-      return s;
+      s += str;
+
+      return s += "$_ESCAPE$_RESET";
     } else {
       throw NoTerminalException();
     }
