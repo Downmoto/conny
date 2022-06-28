@@ -2,7 +2,7 @@ import '../src/curse.dart';
 import '../src/conny.dart';
 import 'dart:io';
 
-/// base class for hadeling loading bars
+/// base class for handeling loading bars
 /// 
 /// * [printName] to print name along side bar
 /// * [showPercent] to print [state] along side bar
