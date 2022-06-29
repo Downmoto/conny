@@ -4,25 +4,49 @@ import 'package:conny/conny.dart';
 void main(List<String> args) {
   Curse c = Curse();
   Conny.erase(screen: true);
-
   c.home();
-  stdout.write("${c.coord.col} ${c.coord.row} {1}");
-  c.moveTo(10, 1);
-  stdout.write("${c.coord.col} ${c.coord.row} {2}");
-  c.moveCursorDown();
-  stdout.write("${c.coord.col} ${c.coord.row} {3}");
-  c.moveCursorDown();
-  stdout.writeln("${c.coord.col} ${c.coord.row} {4}");
 
-  stdout.writeln("${c.coord.col} ${c.coord.row} {5}");
+  int col = stdout.terminalColumns;
+  // int row = stdout.terminalLines;
+
+  int sqr = (col % 2 == 0 ? 26 : 25);
+
+  String h = "Hello World!";
+
+
+  String top = "";
+
+  for (var i = 0; i < sqr; i++) {
+    top += "-";
+  }
+
+  String side = "|";
+
+  // x, y
+  Coord c1 = Coord((col ~/ 2) - (top.length ~/ 2), 0);
+  Coord c2 = Coord((col ~/ 2) + (top.length ~/ 2), 0);
+
+  c.moveToCoord(c1);
+  Conny.write(WriteOptions(fg: [255, 82, 82]), top);
+
+  for (var i = 2; i < sqr ~/ 2; i++) {
+    c.moveTo(c1.col, c1.row + i);
+    Conny.write(WriteOptions(fg: [255, 82, 82]), side);
+    c.moveTo(c2.col - 1, c2.row + i);
+    Conny.write(WriteOptions(fg: [130, 160, 200]), side);
+  }
+
+
+  c.moveTo(c1.col, c1.row + (sqr~/2));
+  Conny.write(WriteOptions(fg: [130, 160, 200]), top);
   c.updateCoords();
-  stdout.write("${c.coord.col} ${c.coord.row} {6}");
 
+  Coord end = c.coord;
+  int n = end.col;
+  int m = end.row;
 
-  c.moveToColumn(stdout.terminalColumns ~/ 2);
-  stdout.write("${c.coord.col} ${c.coord.row} {7}");
-  c.moveCursorDown(by: 3);
-  c.moveCursorLeft(by: 10);
+  c.moveToCoord(Coord((col ~/ 2) - (h.length ~/ 2), (sqr~/2) ~/ 2));
+  stdout.write(h);
 
-  Conny.write(WriteOptions(bold: true, fg: [40, 190, 10]), "{8}");
+  c.moveTo(n,m);
 }
