@@ -13,7 +13,7 @@ A simple dart console library
  - Bars
 
 ## Getting Started
-To get started with conny, look into the example dir in the above repository
+To get started with conny, look into the [example](https://github.com/Downmoto/conny/tree/main/example) dir in the repository
 
 
 ## Documentation
