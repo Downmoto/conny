@@ -1,3 +1,28 @@
+# Content
+- [conny.dart](#connydart)
+  * [Usage](#usage)
+  * [Conny](#conny)
+    * [Fields](#fields)
+    * [Constructor](#constructor)
+    * [Methods](#methods)
+      + [write()](#writewriteoptions-options-string-str-bool-newline-true)
+      + [style()](#stylewriteoptions-options-string-str)
+      + [reset()](#reset)
+      + [setGraphic()](#setgraphicbool-bold--false-bool-dim--false-bool-italic--false-bool-underline--false-bool-strike--false)
+      + [unsetGraphic()](#unsetgraphicbool-bold--false-bool-dim--false-bool-italic--false-bool-underline--false-bool-strike--false)
+      + [setColour()](#setcolourcolour-fg)
+      + [setColour256()](#setcolour256int-idfg)
+      + [setColourRGB()](#setcolourrgblist-fg)
+      + [setBackgroundColour()](#setbackgroundcolourcolour-clr)
+      + [setBackgroudColour256()](#setbackgroudcolour256int-idclr)
+      + [setBackgroundColour()](#setbackgroundcolourlist-clr)
+      + [erase()](#erasebool-screen--false)
+  * [WriteOptions](#writeoptions)
+    * [Fields](#fields-1)
+    * [Constructor](#constructor-1)
+    * [Methods](#methods-1)
+      + [options()](#options)
+
 # conny.dart
 
 ![conny class](../../assets/class_conny.png)
@@ -212,7 +237,7 @@ throws [NoTerminalException] if no terminal is attached
 holds options for [Conny.write] and [Conny.style]
 
 ## Fields
-There are no public ields in the WriteOptions class
+There are no public fields in the WriteOptions class
 
 ## Constructor
 ```dart

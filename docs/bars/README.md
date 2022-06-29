@@ -1,3 +1,18 @@
+# Content
+- [bars.dart](#barsdart)
+  * [Usage](#usage)
+  * [Fields](#fields)
+    + [name](#name)
+    + [length](#length)
+    + [state](#state)
+    + [showName](#showname)
+    + [showPercent](#showpercent)
+    + [light, dark](#light-dark)
+  * [Constructor](#constructor)
+  * [Methods](#methods)
+    + [updateState()](#updatestateint-state)
+    + [start()](#start)
+
 # bars.dart
 
 ![bar class](../../assets/class_bar.png)
