@@ -252,7 +252,7 @@ WriteOptions({
 })
 ```
 WriteOptions are used by the Conny write and style static methods
-all options are optianlly set
+all options are are named arguments
 
 ## Methods
 

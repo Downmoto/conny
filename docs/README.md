@@ -8,6 +8,8 @@
 ## curse
 [Documentation](https://github.com/Downmoto/conny/tree/main/docs/curse)
 
+![curse example](../assets/gifs/curse_example.gif)
+
 ## bars
 [Documentation](https://github.com/Downmoto/conny/tree/main/docs/bars)
 
