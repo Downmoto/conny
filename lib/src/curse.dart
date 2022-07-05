@@ -76,7 +76,7 @@ class Curse {
   Coord home() {
     stdout.write("$_ESCAPE${_CurseCodes.HOME}");
     _coord = _getCursorPosition();
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// move cursor to [column], [row] 
@@ -94,7 +94,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// identical to moveTo but takes a [Coord] object as its sole arg
@@ -112,7 +112,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// move cursor to [column]
@@ -129,7 +129,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
     
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor up [by]
@@ -138,7 +138,7 @@ class Curse {
   Coord moveCursorUp({int by=1}) {
     stdout.write("$_ESCAPE$by${_CurseCodes.UP}");
     _coord = _getCursorPosition();
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor down [by]
@@ -148,7 +148,7 @@ class Curse {
     stdout.write("$_ESCAPE$by${_CurseCodes.DOWN}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor left [by]
@@ -158,7 +158,7 @@ class Curse {
     stdout.write("$_ESCAPE$by${_CurseCodes.LEFT}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor right [by]
@@ -168,7 +168,7 @@ class Curse {
     stdout.write("$_ESCAPE$by${_CurseCodes.RIGHT}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 }
 
