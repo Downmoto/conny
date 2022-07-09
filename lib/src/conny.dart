@@ -328,10 +328,12 @@ class Conny {
   ///
   /// * [screen] is defauled to false,
   /// thus by default [erase] erases the line the cursor is on
-  static void erase({bool screen = false}) {
+  static void erase({bool screen = false, bool toCursor = false}) {
     if (stdout.hasTerminal) {
       if (!screen) {
         stdout.write("$_ESCAPE${_Erase.LINE}");
+      } else if (!toCursor) {
+        stdout.write("$_ESCAPE${_Erase.TOCURSOR}");
       } else {
         stdout.write("$_ESCAPE${_Erase.SCREEN}");
       }
@@ -393,6 +395,7 @@ class WriteOptions {
 class _Erase {
   static const String SCREEN = '2J';
   static const String LINE = '2K';
+  static const String TOCURSOR = '0J';
 }
 
 /// these colours are set by the terminal/user
