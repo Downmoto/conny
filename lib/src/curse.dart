@@ -16,7 +16,7 @@ class Curse {
   late Coord _coord;
 
   /// retrieve the current internally track [Coord]
-  Coord get coord => _coord;
+  Coord get coord => Coord(_coord.col, _coord.row);
 
   /// constructor
   /// * check for valid termnial state or throw [NoTerminalException]
@@ -27,6 +27,30 @@ class Curse {
     } else {
       throw NoTerminalException();
     }
+  }
+
+  /// hides cursor from terminal, if [unhideCursor] 
+  /// is not called after, the cursor will remain hidden 
+  /// after application exits.
+  /// 
+  /// returns [Coord] object
+  Coord hideCursor() {
+    stdout.write("$_ESCAPE${_CurseCodes.HIDE}");
+
+    return Coord(_coord.col, _coord.row);
+  }
+
+
+  /// unhides cursor rom terminal, you should call this before
+  /// your application ends otherwise cursor will remain hidden.
+  /// 
+  /// use [hideCursor] to hide cursor
+  /// 
+  /// returns [Coord] object
+  Coord unhideCursor() {
+    stdout.write("$_ESCAPE${_CurseCodes.UNHIDE}");
+
+    return Coord(_coord.col, _coord.row);
   }
 
   /// store [stdin]'s original state then alter it to extract cursor position, 
@@ -189,4 +213,7 @@ class _CurseCodes {
   static const String DOWN = 'B';
   static const String RIGHT = 'C';
   static const String LEFT = 'D';
+
+  static const String HIDE = '?25l';
+  static const String UNHIDE = '?25h';
 }
