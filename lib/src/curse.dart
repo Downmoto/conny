@@ -171,7 +171,7 @@ class Curse {
   Coord moveCursorDown({int by=1}) {
     if (_coord.row >= stdout.terminalLines) {
       stdout.writeln();
-      moveToCoord(_coord);
+      moveCursorUp();
     }
     stdout.write("$_ESCAPE$by${_CurseCodes.DOWN}");
     _coord = _getCursorPosition();
