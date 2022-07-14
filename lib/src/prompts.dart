@@ -1,189 +1,215 @@
-import 'dart:convert';
-
 import 'package:conny/src/helper/exceptions.dart';
 import 'package:conny/src/curse.dart';
 import 'package:conny/src/conny.dart';
 import 'dart:io';
 
+/// base class for custom prompts
+///
+/// construct the class and use the [execute] method to run it
+///
+/// [tag] is defaulted to '>', it is a public field that can changed freely
 class Prompt {
-  late Map<String, dynamic> _p;
-  late final List _prompts;
-  late final int _len;
-  late final WriteOptions _colour;
+  // store prompt info
+  late final String _question;
+  late final List<Map<String, dynamic>> _answers;
 
+  // index of selected answer
+  int _selected = 0;
+
+  // render answers inline with question
+  late final bool _inline;
+
+  // terminal defaults
+  WriteOptions _mainTheme = WriteOptions();
+
+  // cursor controller
   final Curse _c = Curse();
 
-  dynamic _listner;
-  dynamic _sub;
-  int _subcount = 0;
+  // store terminal linemode and echomode settings to be reverted
+  late final bool _lm;
+  late final bool _em;
 
-  List<String> inputs = [];
+  /// renders before every question, set to '' to stop rendering,
+  /// can be changed freely, defaulted to '>'
+  String tag = '>';
 
-  Prompt(Map<String, dynamic> promptMap) {
-    _p = promptMap;
+  /// pressing this key will exit out of the prompt, 
+  /// can be changed freely, defauled to 'q'
+  String exitKey = 'q';
+  int _ek = 113;
 
-    _prompts = _p['prompts'] as List;
-    _colour = _p['colour'];
+  /// construct prompts with an array of [answers] to one [question]
+  ///
+  /// * [question] will render first
+  /// * [answers] will be rendered in order, see documentation/examples
+  /// for how to structure [answers] array
+  /// * [inline] is an optional param defaulted to false, setting
+  /// inline to true will render answers on the same line as [question]
+  /// * [theme] is a [WriteOptions] optional param, leaving it blank
+  /// will render [question] and unselected [answers] with default
+  /// terminal settings
+  Prompt(String question, List<Map<String, dynamic>> answers,
+      [bool inline = false, WriteOptions? theme])
+      : _question = question,
+        _answers = answers,
+        _inline = inline {
+    if (theme != null) _mainTheme = theme;
 
-    _len = _prompts.length;
+    _lm = stdin.lineMode;
+    _em = stdin.echoMode;
   }
 
-  void _cancel() {
-    stdin.echoMode = true;
-    stdin.lineMode = true;
-
-    _c.unhideCursor();
-  }
-
-  void _init() {
+  /// turn off echo and line mode, hide cursor
+  void _start() {
     stdin.echoMode = false;
     stdin.lineMode = false;
 
-    _sub = stdin.asBroadcastStream(onCancel: ((subscription) {
-      if (_subcount == 0) {
-        _cancel();
-        subscription.cancel();
-      }
-    })).map((event) => event);
+    _ek = exitKey.codeUnits[0];
 
-    // _c.hideCursor();
+    _c.hideCursor();
   }
 
-  void _ask(var p) {
-    Conny.write(_colour, p["question"], newline: false);
-    stdout.write(" ");
+  /// restore echo and line mode, unhide cursor
+  void _done() {
+    _c.unhideCursor();
+    
+    Conny.erase(screen: true);
+
+    stdin.echoMode = _em;
+    stdin.lineMode = _lm;
   }
 
-  bool _storeOnLeft = true;
-  void _handleYN(var prompt, var event) {
-    Coord crd = _c.coord;
+  /// render prompt
+  void _render() {
+    Coord c = _c.coord;
 
-    Conny.erase();
+    _c.moveCursorDown(by: _inline ? 1 : _answers.length + 1);
+    Conny.erase(toCursor: true);
+    _c.moveToCoord(c);
+    _c.moveToColumn(0);
+    Conny.write(_mainTheme, _question, newline: !_inline);
 
-    _ask(prompt);
+    for (var answer in _answers) {
+      stdout.write(' $tag ');
+      Conny.write(
+          answer == _answers[_selected]
+              ? answer['highlight'] ?? _mainTheme
+              : _mainTheme,
+          answer['answer'],
+          newline: !_inline);
 
-    if (event == _Codes.RIGHT) {
-      _storeOnLeft = false;
-    }
+      if (answer['tipText'] != null && answer == _answers[_selected]) {
+        if (_inline) {
+          _c.updateCoords();
+          Coord ct = _c.coord;
 
-    if (event == _Codes.LEFT) {
-      _storeOnLeft = true;
-    }
+          stdout.writeln();
 
-    if (_storeOnLeft) {
-      Conny.write(prompt["highlight"], prompt["yes"]["text"], newline: false);
-      stdout.write(" / ");
-      Conny.write(_colour, prompt["no"]["text"], newline: false);
+          Conny.write(answer['tipHighlight'] ?? _mainTheme, answer['tipText'],
+              newline: false);
 
-      if (prompt["yes"]["tipText"] != null) {
-        stdout.write(" ");
-        Conny.write(
-          prompt["yes"]["tipHighlight"] ?? _colour,
-          prompt["yes"]["tipText"],
-          newline: false
-        );
-      }
-    } else {
-      Conny.write(_colour, prompt["yes"]["text"], newline: false);
-      stdout.write(" / ");
-      Conny.write(prompt["highlight"], prompt["no"]["text"], newline: false);
-
-      if (prompt["no"]["tipText"] != null) {
-        stdout.write(" ");
-        Conny.write(
-          prompt["no"]["tipHighlight"] ?? _colour,
-          prompt["no"]["tipText"],
-          newline: false
-        );
+          _c.updateCoords();
+          _c.moveToCoord(ct);
+        }
       }
     }
-
-    if (event == _Codes.ENTER) {
-      if (_storeOnLeft) prompt["yes"]["function"]();
-      if (!_storeOnLeft) prompt["no"]["function"]();
+    if (!_inline) {
+      Conny.erase();
+      Conny.write(_answers[_selected]['tipHighlight'] ?? _mainTheme,
+          _answers[_selected]['tipText'],
+          newline: false);
     }
-
-    _c.moveToColumn(crd.col);
   }
 
-  void _handleM() {}
-
-  List<String> _storeInput = [];
-  void _handleI(var prompt, var event) {
-    Coord crd = _c.coord;
-
-    Conny.erase();
-
-    _ask(prompt);
-
-    if (event != 'dead') {
-      _storeInput.add(event);
-    }
-    print(_storeInput.join());
-  }
-
-  int _cnt = 0;
+  Coord _rc = Coord(0, 0);
   void execute() {
-    _init();
+    _start();
 
-    switch(_prompts[_cnt]['type']) {
-        case 'yesno' : {
-          _handleYN(_prompts[_cnt], '');
-        }
-        break;
+    List<int> bytes = [];
 
-        case 'input' : {
-          _handleI(_prompts[_cnt], 'dead');
-        }
-        break;
+    _rc = _c.coord;
+    _render();
+    while (true) {
+      int byte = stdin.readByteSync();
+      bytes.add(byte);
+      // print(ascii.decode(bytes));
 
-        default: {
-          _c.moveToColumn(0);
-        }
-      }
+      // exit on 'q' press
+      if (byte == _ek) break;
 
-    _subcount++;
-    _listner = _sub.listen((event) {
-
-      if (event.length == 1 && event[0] == 27) {
-        _subcount--;
-        _listner.cancel();
-      }
-
-      if (event[0] == 10 && _cnt != _len - 1) {
-        _cnt++;
+      if (byte == _Codes.ENTER.codeUnits[0]) {
         stdout.writeln();
+        _answers[_selected]['function']();
+        _c.moveToCoord(_rc);
+
+        break;
       }
 
-      var decoded = ascii.decode(event);
-      var stripped = decoded.replaceAll('\x1b', '');
+      // only read arrow escapes
+      if (bytes.first != 27) bytes.clear();
 
-      switch(_prompts[_cnt]['type']) {
-        case 'yesno' : {
-          _handleYN(_prompts[_cnt], stripped);
+      // handle arrow keypresses, reset bytes array
+      if (bytes.length == 3) {
+        _handleDirection(bytes.last);
+        _render();
+        bytes.clear();
+      }
+    }
+    _done();
+  }
+
+  /// hande arrow keypresses, by altering [_selected] value to
+  /// match correct answer index
+  void _handleDirection(int last) {
+    switch (last) {
+      case _Codes.UP:
+        {
+          if (!_inline) {
+            if (_selected > 0) {
+              _selected--;
+            }
+          }
         }
         break;
 
-        case 'input' : {
-          _handleI(_prompts[_cnt], stripped);
+      case _Codes.DOWN:
+        {
+          if (!_inline) {
+            if (_selected < _answers.length - 1) {
+              _selected++;
+            }
+          }
         }
         break;
 
-        default: {
-          _c.moveToColumn(0);
+      case _Codes.RIGHT:
+        {
+          if (_inline) {
+            if (_selected < _answers.length - 1) {
+              _selected++;
+            }
+          }
         }
-      }
+        break;
 
-
-    });
+      case _Codes.LEFT:
+        {
+          if (_inline) {
+            if (_selected > 0) {
+              _selected--;
+            }
+          }
+        }
+        break;
+    }
   }
 }
 
 class _Codes {
-  static const String UP = '[A';
-  static const String DOWN = '[B';
-  static const String RIGHT = '[C';
-  static const String LEFT = '[D';
+  static const int UP = 65;
+  static const int DOWN = 66;
+  static const int RIGHT = 67;
+  static const int LEFT = 68;
 
   static const String ENTER = '\n';
 }
