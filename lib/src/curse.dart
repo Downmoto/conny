@@ -16,7 +16,7 @@ class Curse {
   late Coord _coord;
 
   /// retrieve the current internally track [Coord]
-  Coord get coord => _coord;
+  Coord get coord => Coord(_coord.col, _coord.row);
 
   /// constructor
   /// * check for valid termnial state or throw [NoTerminalException]
@@ -27,6 +27,30 @@ class Curse {
     } else {
       throw NoTerminalException();
     }
+  }
+
+  /// hides cursor from terminal, if [unhideCursor] 
+  /// is not called after, the cursor will remain hidden 
+  /// after application exits.
+  /// 
+  /// returns [Coord] object
+  Coord hideCursor() {
+    stdout.write("$_ESCAPE${_CurseCodes.HIDE}");
+
+    return Coord(_coord.col, _coord.row);
+  }
+
+
+  /// unhides cursor rom terminal, you should call this before
+  /// your application ends otherwise cursor will remain hidden.
+  /// 
+  /// use [hideCursor] to hide cursor
+  /// 
+  /// returns [Coord] object
+  Coord unhideCursor() {
+    stdout.write("$_ESCAPE${_CurseCodes.UNHIDE}");
+
+    return Coord(_coord.col, _coord.row);
   }
 
   /// store [stdin]'s original state then alter it to extract cursor position, 
@@ -76,7 +100,7 @@ class Curse {
   Coord home() {
     stdout.write("$_ESCAPE${_CurseCodes.HOME}");
     _coord = _getCursorPosition();
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// move cursor to [column], [row] 
@@ -94,7 +118,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// identical to moveTo but takes a [Coord] object as its sole arg
@@ -112,7 +136,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// move cursor to [column]
@@ -129,7 +153,7 @@ class Curse {
       throw CursorOutOfRangeException(stdout.terminalColumns);
     }
     
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor up [by]
@@ -138,17 +162,21 @@ class Curse {
   Coord moveCursorUp({int by=1}) {
     stdout.write("$_ESCAPE$by${_CurseCodes.UP}");
     _coord = _getCursorPosition();
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor down [by]
   /// 
   /// sets and returns [Coord] object
   Coord moveCursorDown({int by=1}) {
+    if (_coord.row >= stdout.terminalLines) {
+      stdout.writeln();
+      moveCursorUp();
+    }
     stdout.write("$_ESCAPE$by${_CurseCodes.DOWN}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor left [by]
@@ -158,7 +186,7 @@ class Curse {
     stdout.write("$_ESCAPE$by${_CurseCodes.LEFT}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 
   /// moves cursor right [by]
@@ -168,7 +196,7 @@ class Curse {
     stdout.write("$_ESCAPE$by${_CurseCodes.RIGHT}");
     _coord = _getCursorPosition();
 
-    return _coord;
+    return Coord(_coord.col, _coord.row);
   }
 }
 
@@ -189,4 +217,7 @@ class _CurseCodes {
   static const String DOWN = 'B';
   static const String RIGHT = 'C';
   static const String LEFT = 'D';
+
+  static const String HIDE = '?25l';
+  static const String UNHIDE = '?25h';
 }
