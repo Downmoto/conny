@@ -11,6 +11,7 @@ A simple dart console library
  - Graphics (bold, italic, etc)
  - Erase
  - Bars
+ - Prompts (Not stable, and not documented. looking in lib folder/prompts.dart should explain usage)
 
 ## Getting Started
 To get started with conny, look into the [example](https://github.com/Downmoto/conny/tree/main/example) dir in the repository
