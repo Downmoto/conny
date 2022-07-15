@@ -1,4 +1,4 @@
-import 'package:conny/src/helper/exceptions.dart';
+// import 'package:conny/src/helper/exceptions.dart';
 import 'package:conny/src/curse.dart';
 import 'package:conny/src/conny.dart';
 import 'dart:io';
